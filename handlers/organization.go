@@ -9,7 +9,40 @@ import (
 )
 
 type Org struct {
-	Action string `json:"action"`
+	Organization Organization `json:"organization"`
+	Action       string       `json:"action"`
+	Sender       Sender       `json:"sender"`
+	Membership   Membership   `json:"membership"`
+	Invitation   Invitation   `json:"invitation"`
+}
+
+type Invitation struct {
+	User    string  `json:"login"`
+	Inviter Inviter `json:"inviter"`
+}
+
+type Inviter struct {
+	User string `json:"login"`
+}
+
+type Organization struct {
+	Name string `json:"login"`
+	Url  string `json:"url"`
+}
+
+type Sender struct {
+	Username string `json:"login"`
+	Type     string `json:"type"`
+}
+
+type Membership struct {
+	Url   string         `json:"url"`
+	State string         `json:"state"`
+	User  MembershipUser `json:"user"`
+}
+
+type MembershipUser struct {
+	Username string `json:"login"`
 }
 
 // orgHandler processes the webhook request
@@ -44,8 +77,17 @@ func OrganizartionHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Action Performed : ", orgResponse.Action)
 
 	response := map[string]interface{}{
-		"action":  orgResponse.Action,
-		"message": "found",
+		"organization":            orgResponse.Organization.Name,
+		"organization URL":        orgResponse.Organization.Url,
+		"action":                  orgResponse.Action,
+		"sender":                  orgResponse.Sender.Username,
+		"victim":                  orgResponse.Membership.User.Username,
+		"victim membership URL":   orgResponse.Membership.Url,
+		"victim membership state": orgResponse.Membership.State,
+
+		// for invitation action
+		"invite sender":   orgResponse.Invitation.Inviter.User,
+		"invite receiver": orgResponse.Invitation.User,
 	}
 
 	responseStr, err := json.Marshal(response)
