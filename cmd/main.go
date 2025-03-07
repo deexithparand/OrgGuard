@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"orgguard/db"
 	"orgguard/handlers"
 )
 
@@ -13,10 +14,14 @@ func main() {
 		port string = "8080"
 	)
 
+	// Initialize database
+	db.InitDB()
+	db.RunMigrations()
+
 	mux := http.NewServeMux()
 
 	// routes
-	mux.HandleFunc("/org", handlers.OrganizartionHandler)
+	mux.HandleFunc("/org", handlers.OrganizationHandler)
 	mux.HandleFunc("/health", handlers.HealthHandler)
 
 	// 404 for unmatched routes

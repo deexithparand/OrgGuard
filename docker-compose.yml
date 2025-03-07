@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: orgguard_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin@1234
+      POSTGRES_DB: orgguard
+    ports:
+      - "5432:5432"
+    volumes:
+      - orgguard_volume:/var/lib/postgresql/data
+
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: orgguard_opa
+    command:
+      - "run"
+      - "--server"
+      - "/policies/policy.rego"
+    volumes:
+      - ./policy.rego:/policies/policy.rego
+    ports:
+      - "8181:8181"
+    
+volumes:
+  orgguard_volume:
+
