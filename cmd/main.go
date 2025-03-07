@@ -16,7 +16,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	// routes
-	mux.HandleFunc("/org", handlers.OrgHandler)
+	mux.HandleFunc("/org", handlers.OrganizartionHandler)
 	mux.HandleFunc("/health", handlers.HealthHandler)
 
 	// 404 for unmatched routes
