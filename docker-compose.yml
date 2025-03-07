@@ -10,21 +10,3 @@ services:
       POSTGRES_DB: orgguard
     ports:
       - "5432:5432"
-    volumes:
-      - orgguard_volume:/var/lib/postgresql/data
-
-  opa:
-    image: openpolicyagent/opa:latest
-    container_name: orgguard_opa
-    command:
-      - "run"
-      - "--server"
-      - "/policies/policy.rego"
-    volumes:
-      - ./policy.rego:/policies/policy.rego
-    ports:
-      - "8181:8181"
-    
-volumes:
-  orgguard_volume:
-

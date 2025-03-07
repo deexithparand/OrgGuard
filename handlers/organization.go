@@ -68,7 +68,7 @@ func validateWithOPA(targetUser string) (bool, error) {
 	var opaResp map[string]bool
 	err = json.NewDecoder(resp.Body).Decode(&opaResp)
 	if err != nil {
-		return false, fmt.Errorf("Failed to parse OPA response: %v", err)
+		return false, fmt.Errorf("failed to parse OPA response: %v", err)
 	}
 
 	return opaResp["result"], nil
@@ -109,21 +109,17 @@ func OrganizationHandler(w http.ResponseWriter, r *http.Request) {
 		targetUser = orgResponse.Membership.User.Username
 	}
 
-	// allowed, err := validateWithOPA(targetUser)
-	// if err != nil {
-	// 	log.Printf("OPA validation error: %v", err)
-	// 	http.Error(w, "OPA validation failed", http.StatusInternalServerError)
-	// 	return
-	// }
+	allowed, err := validateWithOPA(targetUser)
+	if err != nil {
+		log.Printf("OPA validation error: %v", err)
+		http.Error(w, "OPA validation failed", http.StatusInternalServerError)
+		return
+	}
 
-	// opaResult := "passed"
-	// if !allowed {
-	// 	opaResult = "failed"
-	// }
-
-	allowed := true
-
-	opaResult := "true"
+	opaResult := "passed"
+	if !allowed {
+		opaResult = "failed"
+	}
 
 	err = db.SaveLog(
 		orgResponse.Action,
@@ -140,7 +136,7 @@ func OrganizationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !allowed {
-		http.Error(w, "Policy violation: Usernames must start with 'jmd'", http.StatusForbidden)
+		http.Error(w, "Policy violation: Usernames must start with 'jmd'"+targetUser, http.StatusForbidden)
 		return
 	}
 
