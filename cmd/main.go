@@ -4,11 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"orgguard/handlers"
 )
-
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("At good health"))
-}
 
 func main() {
 	var (
@@ -16,19 +13,24 @@ func main() {
 		port string = "8080"
 	)
 
+	mux := http.NewServeMux()
+
 	// routes
-	http.HandleFunc("/", healthHandler)
-	http.HandleFunc("/health", healthHandler)
+	mux.HandleFunc("/org", handlers.OrgHandler)
+	mux.HandleFunc("/health", handlers.HealthHandler)
+
+	// 404 for unmatched routes
+	mux.HandleFunc("/", handlers.NotFoundHandler)
 
 	// started server
-	fmt.Println("Server listening at -> ", addr+port)
+	fmt.Println("Server Listening At ", addr+port)
 
 	// currently mus is not handled
-	err := http.ListenAndServe(addr+port, nil)
+	err := http.ListenAndServe(addr+port, mux)
 	if err != nil {
 		log.Fatalf("error listening to server : %v", err)
 		return
 	}
 
-	fmt.Println("Server says byee..")
+	fmt.Println("Server Exits..")
 }
